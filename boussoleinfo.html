@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Boussole — Lecture</title>
 
-<link rel="stylesheet" href="style.css?v=2060">
+<link rel="stylesheet" href="style.css?v=2070">
 
 <style>
 
@@ -207,12 +207,13 @@
 
 <script>
 
-const params = new URLSearchParams(window.location.search);
-const ratio = parseFloat(params.get("ratio")) || 50;
+document.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const ratio = parseFloat(params.get("ratio")) || 50;
 
-document.getElementById("back-btn").href =
-    "boussole.html?ratio=" + ratio;
-
+    document.getElementById("back-btn").href =
+        "boussole.html?ratio=" + ratio;
+});
 
 </script>
 
