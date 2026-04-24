@@ -57,8 +57,10 @@
 
 // ===== PARAM =====
 const params = new URLSearchParams(window.location.search);
+
 const ratio = parseFloat(params.get("ratio")) || 50;
 
+window.location.href = "boussoleinfo.html?ratio=" + ratio;
 
 
 // ===== ZONE =====
