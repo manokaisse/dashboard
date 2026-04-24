@@ -1,6 +1,6 @@
 const DATA = {
   portfolio: {
-    or_suisse_g: 201.51,
+    or_suisse_g: 201.52,
     or_belgique_g: 0,
     argent_g: 0,
 
