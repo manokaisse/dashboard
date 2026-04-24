@@ -75,7 +75,8 @@
 
 
 <div class="header-right">
-    <a href="index.html" class="badge">← Retour</a>
+document.getElementById("back-btn").href =
+    "boussole.html?ratio=" + ratio; class="badge">← Retour
 </div>
 
 
@@ -203,6 +204,15 @@
 
 </div>
 </div>
+
+
+
+<script>
+
+const params = new URLSearchParams(window.location.search);
+const ratio = parseFloat(params.get("ratio")) || 50;
+
+</script>
 
 </body>
 </html>
