@@ -1,17 +1,17 @@
 const DATA = {
   portfolio: {
-    or_suisse_g: 338.66,
-    or_belgique_g: 130.62,
-    argent_g: 6000,
+    or_suisse_g: 200,
+    or_belgique_g: 0,
+    argent_g: 0,
 
-    or_suisse_cost: 19722.90,
-    or_belgique_cost: 8375.39,
-    argent_cost: 3379.88
+    or_suisse_cost: 9125,
+    or_belgique_cost: 0,
+    argent_cost: 0
   },
 
   etf: {
-    monde: { parts: 5, buy: 761.06 },
-    seniors: { parts: 13, buy: 1048.57 },
+    monde: { parts: 1, buy: 150 },
+    seniors: { parts: 6, buy: 540 },
     juniors: { parts: 0, buy: 0 }
   }
 };
