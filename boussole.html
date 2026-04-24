@@ -31,8 +31,13 @@
 
 
 <div class="boussole-container">
-	    <img src="bous.png" class="boussole-img" alt="Boussole" onclick="window.location.href='boussoleinfo.html'">
-<div class="needle" id="needle"></div>
+
+<img src="bous.png"
+class="boussole-img" alt="Boussole" onclick="window.location.href='boussoleinfo.html?ratio=' + ratio">
+
+<div class="needle" id="needle">
+</div>
+
 </div>
 
 
@@ -60,7 +65,7 @@ const params = new URLSearchParams(window.location.search);
 
 const ratio = parseFloat(params.get("ratio")) || 50;
 
-window.location.href = "boussoleinfo.html?ratio=" + ratio;
+
 
 
 // ===== ZONE =====
