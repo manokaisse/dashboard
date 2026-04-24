@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr"> 
- 
+
 <head>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -413,7 +413,7 @@ function parseCSV(text) {
 function calculate(){
 
     const p = state.prices;
-    
+
     const pf = state.portfolio;
     const etf = state.etf;
     const pe = state.etfPrices;
@@ -703,7 +703,7 @@ function render(data){
     if (!data || !state.prices || !state.portfolio || !state.etf) return;
 
     const p = state.prices;
-    
+
 const goldVar = getVariation(p.gold_per_g, state.goldClose);
 const silverVar = getVariation(p.silver_per_g, state.silverClose);
 
@@ -727,16 +727,20 @@ if(elOr){
 }
 
 
-  
-  
+
+
 const elArgent = document.getElementById("argent");
 
 if(elArgent){
     elArgent.innerHTML = `
         <span>${euro(data.silverTotal)}</span>
-        ${silverVar ? `<span class="kpi-var" style="color:${silverVar.color}">
-            ${silverVar.arrow} ${silverVar.pct.toFixed(2).replace('.',',')}%
-        </span>` : ""}
+        ${
+            pf.argent_g > 0 && silverVar
+            ? `<span class="kpi-var" style="color:${silverVar.color}">
+                ${silverVar.arrow} ${silverVar.pct.toFixed(2).replace('.',',')}%
+              </span>`
+            : ""
+        }
     `;
 }
 
@@ -908,7 +912,7 @@ if(labelE){
     // ===== TOTAL METAUX =====
     setText("metaux-total-bottom", euro(orSuisse + orBelgique + argent));
 
-    
+
 }
 
 
@@ -938,7 +942,7 @@ state.momentum = last?.momentum || 0;
 state.goldClose = last?.goldClose || 0;
 state.silverClose = last?.silverClose || 0;
 
-        
+
 console.log("LAST:", last); // 👈 ICI
 console.log("BPGDM LIVE (G2):", bpgdmLive);
 
@@ -1035,7 +1039,7 @@ render(result);
 
 
 renderMarketState(state.scoreFinal, state.momentum);
-        
+
 
 const alertBox = document.querySelector(".alert-box");
 
@@ -1186,7 +1190,7 @@ async function fetchHistory(){
 
 console.log("HEADER:", rows[0]);
 console.log("ROW 1:", rows[1]);
-    
+
 
 
     const history = [];
@@ -1197,7 +1201,7 @@ console.log("ROW 1:", rows[1]);
         if (!row || row.length < 8) continue;
         const total = cleanNumber(row[1]);
         if (isNaN(total) || total < 1000) continue;
-        
+
         const date = row[0]?.trim();
         const monde = cleanNumber(row[2]);
         const seniors = cleanNumber(row[3]);
@@ -1208,9 +1212,9 @@ console.log("ROW 1:", rows[1]);
 
 const goldClose = cleanNumber(row[11]);   // colonne L
 const silverClose = cleanNumber(row[12]); // colonne M
-        
+
         console.log("ROW:", row);
-      
+
 
         if (date && total > 0) {
             history.push({
@@ -1232,7 +1236,7 @@ const silverClose = cleanNumber(row[12]); // colonne M
 
 console.log("HISTORY:", history);
 
-    
+
     return {
         history,
         bpgdmLive
@@ -1282,7 +1286,7 @@ function renderMarketState(score, momentum){
 
     let arrow = "→";
     let strength = "";
-    
+
     if(momentum > 0.15){
         arrow = "⬆️";
         strength = "forte hausse";
@@ -1303,7 +1307,7 @@ function renderMarketState(score, momentum){
     badge.innerText = `${state} ${arrow} · ${text} (clôtures veille)`;
 badge.style.color = color;
 
-    
+
 // 🔥 ajout dynamique du contexte
 // 🔥 1. construire le texte FINAL
 if(strength){
@@ -1316,11 +1320,11 @@ badge.style.color = color;
 
 // 🔥 3. supprimer context
 context.innerText = "";
-    
+
 }
 
 
-    
+
 
 
 
