@@ -8,7 +8,7 @@ body {
     color: #e5e7eb;
     overscroll-behavior: none;
 }
- 
+
 /* =====  
 background: radial-gradient(circle at top, #0f172a, #020617);
 ===== */  
@@ -30,6 +30,15 @@ html {
 h3 {
     margin-bottom: 6px;
 }
+
+
+h4 span {
+    font-size: 12px;   /* 🔽 plus petit */
+    opacity: 0.6;      /* 🔽 discret */
+    margin-left: 4px;
+    margin-bottom: 10px;
+}
+
 
 /* ===== TEXT UTILS ===== */
 .text-muted { color: #9ca3af; }
@@ -155,6 +164,7 @@ transition: all 0.3s ease;
     box-shadow: 
         0 8px 30px rgba(0,0,0,0.4),
         inset 0 1px 0 rgba(255,255,255,0.03);
+pointer-events: auto;
 }
 
 .card.repartition {
@@ -335,9 +345,13 @@ transition: all 0.3s ease;
     }
 }
 
-.donut.enter {
+
+/*uniquement une animation d’entrée*/
+.donut.enter .donut-inner {
     animation: donutEnter 0.8s ease-out;
 }
+
+
 
 
 
@@ -355,70 +369,88 @@ transition: all 0.3s ease;
 }
 
 .donut {
+    transform: none;
+    position: relative;
     margin: 4px auto;
     isolation: isolate;
-    opacity: 0;
     width: 110px;
     height: 110px;
     border-radius: 50%;
-    position: relative;
     transition: transform 1s ease;
 }
 
 
 .donut-label {
-    text-align: center;
-    font-size: 10px;
-    color: #cbd5f5;
-    line-height: 1.2;
     position: absolute;
-    inset: 0;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
     display: flex;
     align-items: center;
     justify-content: center;
 
-    z-index: 3; /* 🔥 AU-DESSUS du donut */
+    z-index: 10;
+    pointer-events: none;
+
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+
+    transform: translateX(1px);
 }
+
+
+.donut-label > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 2px; /* 🔥 seul réglage autorisé */
+}
+
+
+
+
+.donut-label small {
+    font-size: 10.5px;
+    opacity: 0.65;
+    margin: 0;
+}
+
 
 .donut-label span {
-display: block;
-    font-size: 13px;/* valeur € un peu plus visible */
+    font-size: 14px;
     font-weight: 600;
-    color: #fff;
-
-    
-
+    margin: 0;
 }
+
+
 
 .donut-inner {
     width: 100%;
     height: 100%;
     border-radius: 50%;
+    overflow: hidden;
     box-shadow: 
         0 0 0 1px rgba(255,255,255,0.06),
         0 8px 20px rgba(0,0,0,0.5),
         0 0 40px rgba(250, 204, 21, 0.18);
     animation: donutBreath 6s ease-in-out infinite;
-
+    will-change: transform;
     display: flex;
     align-items: center;
     justify-content: center;
-
-    font-size: 14px;
-    font-weight: 600;
-    color: #e2e8f0;
-
-    text-align: center;
     pointer-events: none;
     z-index: 2;
+    transform-origin: center;
 }
 
-/* 🔥 DOIT être en dehors */
-.donut-inner span {
-    font-size: 13px;  /* 🔽 valeur € */
-    font-weight: 600;
-    text-shadow: 0 0 6px rgba(255,255,255,0.15);
-}
+
+
 
 
 
@@ -481,7 +513,7 @@ display: block;
 
 /* 🔥 hover subtil */
 .donut:hover {
-    transform: scale(1.05) rotate(2deg);
+    transform: scale(1.05);
 }
 
 
@@ -696,6 +728,7 @@ td, th {
 }
 
 .legend-item {
+    font-size: 13px;
     letter-spacing: 0.2px;
 }
 
@@ -1124,6 +1157,8 @@ td, th {
     .market-context {
         font-size: 11px;
     }
+}
+
 
 /* 🔥 DESKTOP = UNE LIGNE */
 .total-left {
@@ -1163,3 +1198,184 @@ td, th {
 }
 
 
+
+
+
+
+
+/* ===== Show valeur ds donut ===== */
+
+
+.donut::before,
+.donut::after {
+    pointer-events: none;
+}
+
+
+
+
+.popup-content {
+    background: linear-gradient(145deg, #0b1220, #020617);
+    padding: 16px 20px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    text-align: center;
+    font-size: 14px;
+}
+
+.popup-content div {
+    margin: 6px 0;
+}
+
+#donut-metaux {
+    touch-action: manipulation;
+    position: relative;
+    z-index: 5;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.donut-inner {
+    pointer-events: none;
+}
+
+
+.donut-label {
+    pointer-events: none;
+}
+
+
+
+
+.donut::after {
+    pointer-events: none;
+}
+
+
+
+.donut-tooltip {
+    position: absolute;
+    inset: 22px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(2, 6, 23, 0.92);
+    border-radius: 50%;
+
+    font-size: 12px;
+    text-align: center;
+    line-height: 1.4;
+
+    /* 🔥 animation smooth */
+    opacity: 0;
+    transform: scale(0.85);
+    transition: all 0.25s ease;
+
+    /* 🔥 interaction */
+    pointer-events: none;
+
+    /* 🔥 IMPORTANT : passe au-dessus de tout */
+    z-index: 5;
+
+    /* 🔥 profondeur */
+    box-shadow:
+        inset 0 0 20px rgba(0,0,0,0.8),
+        0 0 15px rgba(0,0,0,0.4);
+}
+
+
+/* 🔥 état visible */
+.donut-tooltip.show {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+
+/* 🔥 style texte interne */
+.donut-tooltip div {
+    margin: 2px 0;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+
+/* 🔥 petite amélioration lisibilité */
+.donut-tooltip div:nth-child(1) {
+    color: #facc15; /* Or Suisse */
+}
+
+.donut-tooltip div:nth-child(2) {
+    color: #f59e0b; /* Or Belgique */
+}
+
+.donut-tooltip div:nth-child(3) {
+    color: #cbd5f5; /* Argent */
+}
+
+
+.global-split {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+.alloc-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:12px;
+}
+
+.pill{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 14px;
+    border-radius:12px;
+    background:rgba(15,23,42,0.6);
+    font-size:14px;
+    backdrop-filter: blur(6px);
+    border:1px solid rgba(148,163,184,0.1);
+}
+
+/* couleurs subtiles */
+.pill.or strong{ color:#facc15; }
+.pill.argent strong{ color:#e5e7eb; }
+.pill.metaux strong{ color:#38bdf8; }
+.pill.etf strong{ color:#38bdf8; }
+
+
+/* ===== ALIGNEMENT DONUT CONTENT ===== */
+.donut-label .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;     /* 🔥 centre horizontal */
+    justify-content: center; /* 🔥 centre vertical */
+    text-align: center;
+    gap: 2px;
+    width: 100%;
+}
+
+.donut-label .content div {
+    margin: 2px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* 🔥 centre chaque ligne */
+    font-size: 12.5px;
+    line-height: 1.2;
+    gap: 6px;
+}
+
+.donut-label .content small {
+    font-size: 10px;
+    opacity: 0.6;
+}
+.donut-label .content small {
+    font-size: 10px;
+    opacity: 0.6;
+}
