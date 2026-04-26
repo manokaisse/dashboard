@@ -1375,6 +1375,29 @@ labelE.innerHTML = `
 // ===== Render TABLE =====
 function renderTables(data, p, pf, etf, pe){
 
+
+function setPerf(id, value){
+
+    const el = document.getElementById(id);
+    if(!el) return;
+
+    el.innerText = value;
+
+    el.classList.remove("positive", "negative");
+
+    const num = parseFloat(value.replace(",", "."));
+
+    if(!isNaN(num)){
+        if(num >= 0){
+            el.classList.add("positive");
+        } else {
+            el.classList.add("negative");
+        }
+    }
+}
+
+
+
     // ===== VALEURS =====
     const orSuisse = pf.or_suisse_g * p.gold_per_g;
     const orBelgique = pf.or_belgique_g * p.gold_per_g;
@@ -1406,9 +1429,9 @@ function renderTables(data, p, pf, etf, pe){
     setText("benef-or-belgique", euroSigned(benefOrBelgique));
     setText("benef-argent", euroSigned(benefArgent));
 
-    setText("perf-or-suisse", perf(orSuisse, pf.or_suisse_cost));
-    setText("perf-or-belgique", perf(orBelgique, pf.or_belgique_cost));
-    setText("perf-argent", perf(argent, pf.argent_cost));
+    setPerf("perf-or-suisse", perf(orSuisse, pf.or_suisse_cost));
+setPerf("perf-or-belgique", perf(orBelgique, pf.or_belgique_cost));
+setPerf("perf-argent", perf(argent, pf.argent_cost));
 
     // ===== TABLE ETF =====
     setText("etf-monde-parts", etf.monde.parts);
@@ -1423,9 +1446,9 @@ function renderTables(data, p, pf, etf, pe){
     setText("etf-seniors-benef", euroSigned(benefSeniors));
     setText("etf-juniors-benef", euroSigned(benefJuniors));
 
-    setText("etf-monde-perf", perf(vMonde, etf.monde.buy));
-    setText("etf-seniors-perf", perf(vSeniors, etf.seniors.buy));
-    setText("etf-juniors-perf", perf(vJuniors, etf.juniors.buy));
+    setPerf("etf-monde-perf", perf(vMonde, etf.monde.buy));
+setPerf("etf-seniors-perf", perf(vSeniors, etf.seniors.buy));
+setPerf("etf-juniors-perf", perf(vJuniors, etf.juniors.buy));
 
     // ===== TOTAL METAUX =====
     setText("metaux-total-bottom", euro(orSuisse + orBelgique + argent));
