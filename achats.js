@@ -1,13 +1,7 @@
 const achats = [
- {date: "27/04/2026", type: "ETF_MONDE", montant: 471.58, parts: 3, label: "3 ETF Monde"},
- {date: "27/03/2026", type: "ETF_MONDE", montant: 145.36, parts: 1, label: "1 ETF Monde"},
- {date: "02/03/2026", type: "ETF_MONDE", montant: 154.14, parts: 1, label: "1 ETF Monde"},
- {date: "02/03/2026", type: "ETF_MONDE", montant: 154.20, parts: 1, label: "1 ETF Monde"},
- {date: "25/02/2026", type: "ETF_MONDE", montant: 155.11, parts: 1, label: "1 ETF Monde"}, 
- {date: "16/02/2026", type: "ETF_MONDE", montant: 152.25, parts: 1, label: "1 ETF Monde"}, 
- {date: "20/03/2026", type: "ETF_SENIOR", montant: 1048.57, parts: 13, label: "13 ETF SENIORS"} 
+ {date: "02/04/2026", type: "ETF_MONDE", montant: 150.00, parts: 1, label: "1 ETF Monde"}
  ]
 
 const metaux = [
-  {date: "19/01/2026", type: "OR", location: "Belgique", montant: 2250.60, poids: 15.55, label: "5x 1/10 Philh."}
+  {date: "19/01/2026", type: "OR", location: "Suisse", montant: 150.00, poids: 1.00, label: "1x 1g Pamp."}
 ];
