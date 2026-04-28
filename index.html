@@ -9,7 +9,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portefeuille</title>
 
-    <link rel="stylesheet" href="style.css?v=1842">
+    <link rel="stylesheet" href="couleurs.css?v=29">
+    <link rel="stylesheet" href="style.css?v=1861">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -162,6 +163,14 @@
             <span>Séniors :</span>
             <span id="p-seniors"></span>
         </div>
+
+         <div class="legend-item">
+            <span class="dot dot-juniors"></span>
+            <span>Juniors :</span>
+            <span id="p-juniors"></span>
+        </div>
+
+     
     </div>
 </div>
 
@@ -188,7 +197,7 @@
 
 
     <div class="card">
-    <h3>Métaux Précieux</h3>
+        <h3 onclick="goToPage(this, 'achatsmetaux.html')">Métaux Précieux</h3>
 
 
 <!-- 
@@ -249,7 +258,7 @@
 
 
     <div class="etf-header">
-         <h3>ETF <small>(clôtures veille)</small></h3>
+         <h3 onclick="goToPage(this, 'achatsetf.html')">ETF <small>(clôtures veille)</small></h3>
          <div id="bpgdm" class="bpgdm-badge">--%</div>
     </div>
 
@@ -301,20 +310,65 @@
 
 
 
-<!-- ✅ NOUVEAU BLOC % GLOBAL -->
-
-
-
 
 
 
 
 
 <script src="data.js"></script>
-
+<script src="achats.js"></script>
 
 <script>
 // ===== alert("JS OK");  =====
+
+
+// =====  Récupérer les couleurs dans JS
+const styles = getComputedStyle(document.documentElement);
+
+const COLORS = {
+  or_suisse: styles.getPropertyValue('--or-suisse').trim(),
+  or_belgique: styles.getPropertyValue('--or-belgique').trim(),
+  argent: styles.getPropertyValue('--argent').trim(),
+  etf_monde: styles.getPropertyValue('--etf-monde').trim(),
+  etf_seniors: styles.getPropertyValue('--etf-seniors').trim(),
+  etf_juniors: styles.getPropertyValue('--etf-juniors').trim(),
+  gap: styles.getPropertyValue('--donut-gap').trim(),
+  perf_positive: styles.getPropertyValue('--perf-positive').trim(),
+  perf_negative: styles.getPropertyValue('--perf-negative').trim(),
+  bpgdm_neutral: styles.getPropertyValue('--bpgdm-neutral').trim(),
+  bpgdm_accum: styles.getPropertyValue('--bpgdm-accum').trim(),
+  market_extreme_low: styles.getPropertyValue('--market-extreme-low').trim(),
+  market_low: styles.getPropertyValue('--market-low').trim(),
+  market_neutral: styles.getPropertyValue('--market-neutral').trim(),
+  market_high: styles.getPropertyValue('--market-high').trim(),
+  market_extreme_high: styles.getPropertyValue('--market-extreme-high').trim(),
+  chart_up: styles.getPropertyValue('--chart-up').trim(),
+  chart_down: styles.getPropertyValue('--chart-down').trim(),
+  chart_up_soft: styles.getPropertyValue('--chart-up-soft').trim(),
+  chart_down_soft: styles.getPropertyValue('--chart-down-soft').trim(),
+  chart_mm: styles.getPropertyValue('--chart-mm').trim(),
+  chart_tooltip_bg: styles.getPropertyValue('--chart-tooltip-bg').trim(),
+  chart_tooltip_border: styles.getPropertyValue('--chart-tooltip-border').trim(),
+  chart_text: styles.getPropertyValue('--chart-text').trim(),
+  chart_white: styles.getPropertyValue('--chart-white').trim()
+ };
+
+
+// ===== venant de achat.js pour représentation graphique ===== 
+function normalizeDateFR(date) {
+  const [day, month] = date.split("/");
+  return `${day.padStart(2,'0')}/${month.padStart(2,'0')}`;
+}
+ 
+function getAchatsByLabel(label) {
+  return achats.filter(a => normalizeDateFR(a.date) === label);
+}
+
+function hasAchatLabel(label) {
+  return achats.some(a => normalizeDateFR(a.date) === label);
+}
+
+ 
 
 
 // ===== CONFIG =====
@@ -369,7 +423,7 @@ async function fetchPrices(){
 
     async function fetchETFPrices(){
 
-    const API_KEY = "5fe269a5d88f407699f9fd930a6aeb4e";
+    const API_KEY = "e10aefe097fe40fba25f4e129bdf0c4f";
 
     // ===== CACHE =====
     const cache = JSON.parse(localStorage.getItem("etfPrices"));
@@ -441,6 +495,8 @@ async function fetchPrices(){
 }
 
 
+
+// ===== parseCSV ===== 
 function parseCSV(text) {
     return text
         .trim()
@@ -449,16 +505,11 @@ function parseCSV(text) {
 }
 
 
-
-
-
-
-
-// ===== CALCUL =====
+// ===== CALCULATE =====
 function calculate(){
 
     const p = state.prices;
-
+    
     const pf = state.portfolio;
     const etf = state.etf;
     const pe = state.etfPrices;
@@ -646,24 +697,23 @@ function getCombinedSignal(ratio, bpgdm){
 }
 
 
+ 
 
 
 function applyRatioColor(ratio){
 
     const el = document.getElementById("alert-text");
-
-    el.classList.remove("positive", "negative");
+    if(!el) return;
+ 
+        el.classList.remove("ratio-froid", "ratio-moyen", "ratio-chaud");
 
     if(ratio >= 50){
-        el.style.color = "#93c5fd"; // bleu froid
+         el.classList.add("ratio-froid");
     } else if(ratio >= 40){
-        el.style.color = "#facc15"; // jaune
+         el.classList.add("ratio-moyen");
     } else {
-        el.style.color = "#ef4444"; // rouge
+         el.classList.add("ratio-chaud");
     }
-    el.style.fontWeight = "600";
-        el.style.transition = "0.3s";
-
 }
 
 
@@ -710,14 +760,14 @@ function animateDonut(el, target1, target2, duration = 800){
 
 el.style.background = `
     conic-gradient(
-        #facc15 0% ${p1 - gap}%,
-        rgba(2,6,23,0.75) ${p1 - gap}% ${p1 + gap}%,
+         ${COLORS.or_suisse} 0% ${p1 - gap}%,
+         ${COLORS.gap} ${p1 - gap}% ${p1 + gap}%,
 
-        #f59e0b ${p1 + gap}% ${p1 + p2 - gap}%,
-        rgba(2,6,23,0.75) ${p1 + p2 - gap}% ${p1 + p2 + gap}%,
+         ${COLORS.or_belgique} ${p1 + gap}% ${p1 + p2 - gap}%,
+         ${COLORS.gap} ${p1 + p2 - gap}% ${p1 + p2 + gap}%,
 
-        #9ca3af ${p1 + p2 + gap}% ${100 - gap}%,
-        rgba(2,6,23,0.75) ${100 - gap}% 100%
+         ${COLORS.argent} ${p1 + p2 + gap}% ${100 - gap}%,
+         ${COLORS.gap} ${100 - gap}% 100%
     )
 `;
 
@@ -730,8 +780,34 @@ el.style.background = `
 }
 
 
-function animateDonutETF(el, e1, e2, duration = 800){
 
+
+ 
+function animateDonutETF(el, e1, e2, e3, duration = 800){
+
+console.log("ETF %:", e1, e2, e3);
+
+ 
+ // 🔒 couper les micro valeurs
+    e1 = e1 < 0.01 ? 0 : e1;
+    e2 = e2 < 0.01 ? 0 : e2;
+    e3 = e3 < 0.01 ? 0 : e3;
+
+    let total = e1 + e2 + e3;
+
+
+// 💥 cas critique : tout à zéro
+    if(total === 0){
+        el.style.background = COLORS.etf_juniors; // ou une couleur neutre
+        return;
+    }
+
+
+// 🔄 normalisation
+    e1 = (e1 / total) * 100;
+    e2 = (e2 / total) * 100;
+    e3 = (e3 / total) * 100;
+ 
     let start = null;
 
     function step(timestamp){
@@ -741,16 +817,13 @@ function animateDonutETF(el, e1, e2, duration = 800){
 
         const p1 = e1 * progress;
         const p2 = e2 * progress;
-
-const overlap = 0.2;
-const p1End = Math.min(p1 + overlap, 100);
-const p2End = Math.min(p1 + p2 + overlap, 100);
+        const p3 = e3 * progress;
 
 el.style.background = `
     conic-gradient(
-        #38bdf8 0% ${p1}%,
-        #22c55e ${p1}% ${p1 + p2}%,
-        #64748b ${p1 + p2}% 100%
+        ${COLORS.etf_monde} 0% ${p1}%,
+        ${COLORS.etf_seniors} ${p1}% ${p1 + p2}%,
+        ${COLORS.etf_juniors} ${p1 + p2}% 100%
     )
 `;
 
@@ -763,6 +836,11 @@ el.style.background = `
 }
 
 
+
+
+
+
+ 
 
 // ===== RENDER KPI =====
 function renderKPI(data, p){
@@ -774,7 +852,7 @@ function renderKPI(data, p){
     if(elOr){
         elOr.innerHTML = `
             <span>${euro(data.goldTotal)}</span>
-            ${goldVar ? `<span class="kpi-var" style="color:${goldVar.color}">
+            ${goldVar ? `<span class="kpi-var ${goldVar.class}">
                 ${goldVar.arrow} ${goldVar.pct.toFixed(2).replace('.',',')}%
             </span>` : ""}
         `;
@@ -784,7 +862,7 @@ function renderKPI(data, p){
     if(elArgent){
         elArgent.innerHTML = `
             <span>${euro(data.silverTotal)}</span>
-            ${silverVar ? `<span class="kpi-var" style="color:${silverVar.color}">
+            ${silverVar ? `<span class="kpi-var ${silverVar.class}">
                 ${silverVar.arrow} ${silverVar.pct.toFixed(2).replace('.',',')}%
             </span>` : ""}
         `;
@@ -851,7 +929,7 @@ function renderTitles(data){
     const titleE = document.getElementById("title-etf");
 
     if (titleM) {
-
+        
 titleM.innerHTML = `Métaux <span>(${percent(data.pMetaux)})</span>`;
 
     }
@@ -915,7 +993,7 @@ state.momentum = last?.momentum || 0;
 state.goldClose = last?.goldClose || 0;
 state.silverClose = last?.silverClose || 0;
 
-
+        
 console.log("LAST:", last); // 👈 ICI
 console.log("BPGDM LIVE (G2):", bpgdmLive);
 
@@ -933,45 +1011,38 @@ state.bpgdm = (bpgdmLive !== 0 ? bpgdmLive : last?.bpgdm);
 // 🔥 input Bpgdm dans ETF        
 const elB = document.getElementById("bpgdm");
 
-if(elB){
+if (elB) {
 
-    elB.classList.remove("flash-strong");
+    // 🔄 RESET
+    elB.classList.remove(
+        "flash-strong",
+        "bpgdm-buy",
+        "bpgdm-sell",
+        "bpgdm-neutral",
+        "bpgdm-accum"
+    );
 
-    const value = state.bpgdm?.toFixed(2) || 0;
+    const bpgdm = Number(state.bpgdm) || 0;
+    const value = bpgdm.toFixed(2);
 
-    // 🔥 PRIORITÉ 1 — ACHAT
-    if(state.bpgdm <= 5){
+    let text = `Bpgdm : ${value}%`;
 
-        elB.innerText = `Bpgdm : ${value}% • Achats Séniors`;
-        elB.style.color = "#22c55e";
-        elB.classList.add("flash-strong");
-
+    if (bpgdm <= 5) {
+        text += " • Achats Séniors";
+        elB.classList.add("bpgdm-buy", "flash-strong");
     }
-
-    // 🔥 PRIORITÉ 2 — VENTE
-    else if(state.bpgdm >= 70){
-
-        elB.innerText = `Bpgdm : ${value}% • Vendre Séniors`;
-        elB.style.color = "#ef4444";
-        elB.classList.add("flash-strong");
-
+    else if (bpgdm >= 70) {
+        text += " • Vendre Séniors";
+        elB.classList.add("bpgdm-sell", "flash-strong");
     }
-
-    // 🟠 ZONE NEUTRE
-    else if(state.bpgdm >= 50){
-
-        elB.innerText = `Bpgdm : ${value}%`;
-        elB.style.color = "#fb923c";
-
+    else if (bpgdm >= 50) {
+        elB.classList.add("bpgdm-neutral");
     }
-
-    // 🟢 ACCUMULATION
     else {
-
-        elB.innerText = `Bpgdm : ${value}%`;
-        elB.style.color = "#4ade80";
-
+        elB.classList.add("bpgdm-accum");
     }
+
+    elB.innerText = text;
 }
 
 
@@ -1078,23 +1149,30 @@ const lastHistory = historyList.at(-1)?.total || 0;
 const diff = result.total - lastHistory;
 const pct = lastHistory ? (diff / lastHistory) * 100 : 0;
 
-const el = document.getElementById("variation");
+const variationEl = document.getElementById("variation");
 
-if (el) {
-    const sign = diff >= 0 ? "+" : "";
+if (variationEl) {
+    const sign = diff > 0 ? "+" : "";
 
     const diffStr = sign + Math.round(diff).toLocaleString('fr-BE') + " €";
     const pctStr = sign + pct.toFixed(2).replace('.', ',') + "%";
 
-    el.innerText = diffStr + " (" + pctStr + ")";
+    variationEl.innerText = diffStr + " (" + pctStr + ")";
 
-    el.classList.remove("positive", "negative");
-    el.classList.add(diff >= 0 ? "positive" : "negative");
+    // RESET
+    variationEl.classList.remove("positive", "negative");
 
-el.classList.add("flash");
-setTimeout(() => {
-    el.classList.remove("flash");
-}, 400);
+    if (diff > 0) {
+        variationEl.classList.add("positive");
+    } else if (diff < 0) {
+        variationEl.classList.add("negative");
+    }
+
+    // animation
+    variationEl.classList.add("flash");
+    setTimeout(() => {
+        variationEl.classList.remove("flash");
+    }, 400);
 }
 
 
@@ -1133,7 +1211,7 @@ function getVariation(now, close){
     return {
         pct,
         arrow: pct >= 0 ? "↑" : "↓",
-        color: pct >= 0 ? "#22c55e" : "#ef4444"
+        class: pct >= 0 ? "positive" : "negative"
     };
 }
 
@@ -1141,9 +1219,7 @@ function getVariation(now, close){
 // ===== HISTORY =====
 async function fetchHistory(){
 
-    const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSpG560WkIILBvD5K3HQh_NyHyC7dUZJFPUwR6J_xn_wFxJtkD-WCuApJQnFQAbijjGE4GwTvV6ghri/pub?gid=1311770820&single=true&output=csv";
-
-
+    const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQQqy9DRNPqKY59Ka56rNkWGwYfd7XqKiGh6YJxudczufOx7ZOW6SzlTObz4DLG4t6AK9qmBfn6Tl78/pub?gid=1311770820&single=true&output=csv";
 
     const res = await fetch(url);
     const text = await res.text();
@@ -1161,7 +1237,7 @@ async function fetchHistory(){
 
 console.log("HEADER:", rows[0]);
 console.log("ROW 1:", rows[1]);
-
+    
 
 
     const history = [];
@@ -1172,7 +1248,7 @@ console.log("ROW 1:", rows[1]);
         if (!row || row.length < 8) continue;
         const total = cleanNumber(row[1]);
         if (isNaN(total) || total < 1000) continue;
-
+        
         const date = row[0]?.trim();
         const monde = cleanNumber(row[2]);
         const seniors = cleanNumber(row[3]);
@@ -1183,9 +1259,9 @@ console.log("ROW 1:", rows[1]);
 
 const goldClose = cleanNumber(row[11]);   // colonne L
 const silverClose = cleanNumber(row[12]); // colonne M
-
+        
         console.log("ROW:", row);
-
+      
 
         if (date && total > 0) {
             history.push({
@@ -1207,7 +1283,7 @@ const silverClose = cleanNumber(row[12]); // colonne M
 
 console.log("HISTORY:", history);
 
-
+    
     return {
         history,
         bpgdmLive
@@ -1227,37 +1303,37 @@ function renderMarketState(score, momentum){
 
     let state = "";
     let text = "";
-    let color = "#94a3b8";
+    let color = COLORS.market_neutral;
 
     if(score < 0.1){
         state = "🚨 EXTRÊME BAS";
         text = "Marché en stress extrême";
-        color = "#ef4444";
+        color = COLORS.market_extreme_low;
     }
     else if(score < 0.25){
         state = "🔻 BAS";
         text = "Marché faible";
-        color = "#fb923c";
+        color = COLORS.market_low;
     }
     else if(score < 0.5){
         state = "⚖️ NEUTRE";
         text = "Marché équilibré";
-        color = "#94a3b8";
+        color = COLORS.market_neutral;
     }
     else if(score < 0.75){
         state = "🔺 HAUT";
         text = "Marché solide";
-        color = "#22c55e";
+        color = COLORS.market_high;
     }
     else{
         state = "🔥 EXTRÊME HAUT";
         text = "Marché en excès";
-        color = "#facc15";
+        color = COLORS.market_extreme_high;
     }
 
     let arrow = "→";
     let strength = "";
-
+    
     if(momentum > 0.15){
         arrow = "⬆️";
         strength = "forte hausse";
@@ -1276,24 +1352,32 @@ function renderMarketState(score, momentum){
     }
 
     badge.innerText = `${state} ${arrow} · ${text} (clôtures veille)`;
-badge.style.color = color;
+    badge.style.color = color;
 
-
+    
 // 🔥 ajout dynamique du contexte
 // 🔥 1. construire le texte FINAL
 if(strength){
     text += " : " + strength;
 }
 
-// 🔥 2. injecter dans badge
-badge.innerText = `${state} ${arrow} · ${text} (clôtures veille)`;
-badge.style.color = color;
-
-// 🔥 3. supprimer context
-context.innerText = "";
-
+  badge.innerText = `${state} ${arrow} · ${text} (clôtures veille)`;
+  badge.style.color = color;
+  updateThemeColor(color);
+ 
+  context.innerText = "";
+    
 }
 
+function updateThemeColor(color){
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if(metaTheme && color){
+        metaTheme.setAttribute("content", color);
+    }
+}
+
+
+ 
 
 
 // ===== Render DONUTS =====
@@ -1335,17 +1419,19 @@ labelM.innerHTML = `
         }
     }
 
-    // ===== DONUT ETF =====
+    // ===== RENDER DONUT ETF =====
     const e1 = Math.max(0, data.pMonde || 0);
     const e2 = Math.max(0, data.pSeniors || 0);
+    const e3 = Math.max(0, data.pJuniors || 0);
 
     setText("p-monde", percent(e1));
     setText("p-seniors", percent(e2));
-
+    setText("p-juniors", percent(e3));
+ 
     const de = document.querySelector(".donut.etf .donut-inner");
 
     if(de){
-        animateDonutETF(de, e1, e2);
+        animateDonutETF(de, e1, e2, e3);
 
         de.parentElement.classList.add("show", "enter");
         setTimeout(() => {
@@ -1371,7 +1457,7 @@ labelE.innerHTML = `
 
 
 
-
+    
 // ===== Render TABLE =====
 function renderTables(data, p, pf, etf, pe){
 
@@ -1395,6 +1481,7 @@ function setPerf(id, value){
         }
     }
 }
+
 
 
 
@@ -1430,8 +1517,8 @@ function setPerf(id, value){
     setText("benef-argent", euroSigned(benefArgent));
 
     setPerf("perf-or-suisse", perf(orSuisse, pf.or_suisse_cost));
-setPerf("perf-or-belgique", perf(orBelgique, pf.or_belgique_cost));
-setPerf("perf-argent", perf(argent, pf.argent_cost));
+    setPerf("perf-or-belgique", perf(orBelgique, pf.or_belgique_cost));
+    setPerf("perf-argent", perf(argent, pf.argent_cost));
 
     // ===== TABLE ETF =====
     setText("etf-monde-parts", etf.monde.parts);
@@ -1447,8 +1534,8 @@ setPerf("perf-argent", perf(argent, pf.argent_cost));
     setText("etf-juniors-benef", euroSigned(benefJuniors));
 
     setPerf("etf-monde-perf", perf(vMonde, etf.monde.buy));
-setPerf("etf-seniors-perf", perf(vSeniors, etf.seniors.buy));
-setPerf("etf-juniors-perf", perf(vJuniors, etf.juniors.buy));
+    setPerf("etf-seniors-perf", perf(vSeniors, etf.seniors.buy));
+    setPerf("etf-juniors-perf", perf(vJuniors, etf.juniors.buy));
 
     // ===== TOTAL METAUX =====
     setText("metaux-total-bottom", euro(orSuisse + orBelgique + argent));
@@ -1457,6 +1544,18 @@ setPerf("etf-juniors-perf", perf(vJuniors, etf.juniors.buy));
 
 
 
+
+// 👇 Effect clignotant graphique pour les achats
+let pulse = 0;
+
+setInterval(() => {
+  pulse += 0.1;
+  if (pulse > Math.PI * 2) pulse = 0;
+
+  if (window.chart10j) {
+    window.chart10j.update();
+  }
+}, 100);
 
 
 
@@ -1494,204 +1593,214 @@ const last = history.slice(-(state.timeframe || 10));
     });
 
 
+ 
+ 
 // ===== MOYENNE MOBILE 7 =====
-    const movingAvg = enriched.map((_, i, arr) => {
-        if (i < 6) {
-    return arr.slice(0, i+1).reduce((a,v)=>a+v.total,0)/(i+1);
-}
+const movingAvg = enriched.map((_, i, arr) => {
+    if (i < 6) {
+        return arr.slice(0, i + 1).reduce((a, v) => a + v.total, 0) / (i + 1);
+    }
 
-        const slice = arr.slice(i - 6, i + 1);
-        const sum = slice.reduce((acc, v) => acc + v.total, 0);
+    const slice = arr.slice(i - 6, i + 1);
+    const sum = slice.reduce((acc, v) => acc + v.total, 0);
 
-        return sum / 7;
-    });
+    return sum / 7;
+});
 
+const ctx = document.getElementById("chart-10j").getContext("2d");
 
+const first = enriched[0].total;
+const lastVal = enriched.at(-1).total;
+const isUp = lastVal >= first;
 
-    const ctx = document.getElementById("chart-10j").getContext("2d");
-
-    const first = enriched[0].total;
-    const lastVal = enriched.at(-1).total;
-    const isUp = lastVal >= first;
-
-// 🔥 couleur du titre selon tendance
+// ===== TITRE =====
 const title = document.getElementById("chart-title");
 if (title) {
-    title.style.color = isUp ? "#22c55e" : "#ef4444";
+    title.style.color = isUp ? COLORS.chart_up : COLORS.chart_down;
 }
 
-    const color = isUp ? "34,197,94" : "239,68,68";
+// ===== HELPERS =====
+function hexToRgba(hex, alpha) {
+    if (!hex) return `rgba(0,0,0,${alpha})`;
+    const r = parseInt(hex.slice(1,3),16);
+    const g = parseInt(hex.slice(3,5),16);
+    const b = parseInt(hex.slice(5,7),16);
+    return `rgba(${r},${g},${b},${alpha})`;
+}
 
-    const gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
-gradient.addColorStop(0, isUp
-    ? "rgba(34,197,94,0.5)"
-    : "rgba(239,68,68,0.5)"
-);
-gradient.addColorStop(0.6, isUp
-    ? "rgba(34,197,94,0.15)"
-    : "rgba(239,68,68,0.15)"
-);
+// ===== GRADIENT =====
+const baseColor = isUp ? COLORS.chart_up : COLORS.chart_down;
+
+const gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
+gradient.addColorStop(0, hexToRgba(baseColor, 0.5));
+gradient.addColorStop(0.6, hexToRgba(baseColor, 0.15));
 gradient.addColorStop(1, "rgba(0,0,0,0)");
 
+// ===== DESTROY =====
+if (window.chart10j) {
+    window.chart10j.destroy();
+}
 
-    if (window.chart10j) {
-        window.chart10j.destroy();
-    }
+// ===== CHART =====
+window.chart10j = new Chart(ctx, {
+    type: "line",
+    data: {
+        labels: labels,
+        datasets: [
+            {
+                data: enriched.map(e => e.total),
+                tension: 0.4,
+                borderColor: baseColor,
+                backgroundColor: gradient,
+                fill: true,
 
-    window.chart10j = new Chart(ctx, {
-        type: "line",
-        data: {
-            labels: labels,
-            datasets: [
-
-                // 🔵 COURBE PRINCIPALE
-                {
-                    data: enriched.map(e => e.total),
-                    tension: 0.4,
-                    borderColor: isUp ? "#22c55e" : "#ef4444",
-                    backgroundColor: gradient,
-                    fill: true,
-
-                    pointRadius: 3,
-
-// 🔥 effet snap
-pointHitRadius: 20,
-
-pointHoverRadius: 12,
-pointHoverBorderWidth: 3,
-pointHoverBorderColor: "#ffffff",
-
-// 🔥 effet glow
-pointHoverBackgroundColor: function(context) {
-    const i = context.dataIndex;
-    const diff = enriched[i]?.diff || 0;
-
-    return diff >= 0 ? "#4ade80" : "#f87171";
-},
-
-pointHoverBorderColor: "#ffffff",
-
-
-                    pointBackgroundColor: function(context) {
-                        const i = context.dataIndex;
-                        const diff = enriched[i]?.diff || 0;
-                        return diff >= 0 ? "#22c55e" : "#ef4444";
-                    },
-
-                    pointBorderWidth: 0
+             
+                pointRadius: (context) => {
+                 const label = context.chart.data.labels[context.dataIndex];
+                 if (hasAchatLabel(label)) {return 4 + Math.sin(pulse) * 2;}
+                 return 3;
                 },
 
-                // 🟣 MOYENNE MOBILE (MM7)
-                {
-                    data: movingAvg,
-                    tension: 0.4,
-                    borderColor: "#a78bfa",
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    borderDash: [6,6],
-                    fill: false
-                }
-            ]
-        },
 
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
 
-            interaction: {
-    mode: "index",
-    intersect: false,
-    axis: "x" // 🔥 verrou horizontal
-},
 
-hover: {
-    mode: "index",
-    intersect: false
-},
+             
+                pointHitRadius: 20,
 
-            plugins: {
-                legend: { display: false },
+                pointHoverRadius: 12,
+                pointHoverBorderWidth: 3,
+                pointHoverBorderColor: COLORS.chart_white,
 
-                tooltip: {
-    backgroundColor: "#0f172a",
-    borderColor: "#38bdf8",
-    borderWidth: 1,
-    titleColor: "#e2e8f0",
-    bodyColor: "#e2e8f0",
-    displayColors: false,
+                pointHoverBackgroundColor: (context) => {
+                    const i = context.dataIndex;
+                    const diff = enriched[i]?.diff || 0;
+                    return diff >= 0 ? COLORS.chart_up_soft : COLORS.chart_down_soft;
+                },
 
-    // 🔥 filtre direct (plus propre que dans label)
-    filter: function(context) {
-        return context.datasetIndex === 0;
+                pointBackgroundColor: (context) => {
+                    const i = context.dataIndex;
+                    const diff = enriched[i]?.diff || 0;
+                    return diff >= 0 ? COLORS.chart_up : COLORS.chart_down;
+                },
+
+                pointBorderWidth: (context) => {
+                   const label = context.chart.data.labels[context.dataIndex];
+                   return hasAchatLabel(label) ? 2 : 0;}
+               },
+             
+            {
+                data: movingAvg,
+                tension: 0.4,
+                borderColor: COLORS.chart_mm,
+                borderWidth: 2,
+                pointRadius: 0,
+                borderDash: [6, 6],
+                fill: false
+            }
+        ]
     },
 
-    callbacks: {
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
 
-        label: function(context) {
+        interaction: {
+            mode: "index",
+            intersect: false,
+            axis: "x"
+        },
 
-            const i = context.dataIndex;
-            const point = enriched[i];
+        plugins: {
+            legend: { display: false },
 
-            if (!point) return "";
+            tooltip: {
+                backgroundColor: COLORS.chart_tooltip_bg,
+                borderColor: COLORS.chart_tooltip_border,
+                borderWidth: 1,
+                titleColor: COLORS.chart_text,
+                bodyColor: COLORS.chart_text,
+                displayColors: false,
 
-            const value = point.total.toLocaleString('fr-BE') + " €";
+                filter: ctx => ctx.datasetIndex === 0,
 
-            const diff = point.diff || 0;
-            const pct = point.pct || 0;
-
-            if (Math.abs(diff) < 1) {
-                return [value];
+                callbacks: {
+                    label: (context) => {
+                    const i = context.dataIndex;
+                    const point = enriched[i];
+                    if (!point) return "";
+                
+                    const value = point.total.toLocaleString('fr-BE') + " €";
+                
+                    const diff = point.diff || 0;
+                    const pct = point.pct || 0;
+                
+                    const label = context.chart.data.labels[i];
+                    const achatsJour = getAchatsByLabel(label);
+                
+                    let lines = [value];
+                
+                    // 📊 variation
+                    if (Math.abs(diff) >= 1) {
+                        const sign = diff >= 0 ? "+" : "";
+                        lines.push(
+                            `${sign}${diff.toLocaleString('fr-BE', { maximumFractionDigits: 0 })} € ` +
+                            `(${sign}${pct.toFixed(2).replace('.', ',')}%)`
+                        );
+                    }
+                
+                    // 🔥 ACHATS
+                    if (achatsJour.length > 0) {
+                        lines.push(""); // espace
+                        lines.push("🟢 ACHAT" + (achatsJour.length > 1 ? ` (${achatsJour.length})` : ""));
+                
+                        achatsJour.forEach(a => {
+                            let line = `• ${a.label}`;
+                
+                            if (a.montant) {
+                                line += ` — ${Math.round(a.montant)} €`;
+                            }
+                
+                            lines.push(line);
+                        });
+                    }
+                
+                    return lines;
+                }// !!! Fin Label  
+                }// !!! Fincallbacks
             }
+        },
 
-            const sign = diff >= 0 ? "+" : "";
-
-            const diffStr = sign + diff.toLocaleString('fr-BE', {maximumFractionDigits: 0}) + " €";
-            const pctStr = sign + pct.toFixed(2).replace('.', ',') + "%";
-
-            return [
-                value,
-                diffStr + " (" + pctStr + ")"
-            ];
-        }
-    }
-}
-
-},
-
-            scales: {
-                x: {
-                    ticks: { color: "#94a3b8" },
-                    grid: { color: "rgba(148,163,184,0.05)" }
-                },
-                y: {
-                    ticks: {
-                        color: "#94a3b8",
-                        callback: v => v.toLocaleString('fr-BE') + " €"
-                    },
-                    grid: { color: "rgba(148,163,184,0.05)" }
-                }
+        scales: {
+            x: {
+                ticks: { color: COLORS.chart_text },
+                grid: { color: "rgba(148,163,184,0.05)" }
             },
+            y: {
+                ticks: {
+                    color: COLORS.chart_text,
+                    callback: v => v.toLocaleString('fr-BE') + " €"
+                },
+                grid: { color: "rgba(148,163,184,0.05)" }
+            }
+        },
 
-            animation: {
-    duration: 600,
-    easing: "easeOutCubic"
-},
-transitions: {
-    active: {
         animation: {
-            duration: 300
+            duration: 600,
+            easing: "easeOutCubic"
+        },
+
+        transitions: {
+            active: {
+                animation: {
+                    duration: 300
+                }
+            }
         }
     }
-}
-
-        }
-    });
-}
-
-
-
-
-
+}); // fin new Chart
+} // ✅ ICI → fermeture de renderChart()
+ 
+ 
 // ===== START =====
 window.addEventListener("DOMContentLoaded", () => {
 
@@ -1751,7 +1860,7 @@ if (donut) {
 
         } else {
 
-
+            
 // retour affichage normal
 
 const totalMetaux = orSuisse + orBelgique + argent;
@@ -1770,7 +1879,7 @@ const totalMetaux = orSuisse + orBelgique + argent;
     });
 }
 
-
+  
 
 // ===== CLICK DONUT ETF =====
 const donutETF = document.querySelector(".donut.etf");
@@ -1827,7 +1936,7 @@ labelE.innerHTML = `
 
 
 
-
+          
 
     // ===== CLICK RATIO =====
     const ratioEl = document.getElementById("ratio");
@@ -1894,3 +2003,4 @@ function goToPage(el, url) {
 
 </body>
 </html>
+ 
