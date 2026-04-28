@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Achats</title>
+
+
+<link rel="stylesheet" href="couleurs.css?v=11">
+<link rel="stylesheet" href="style.css?v=11">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <h2>🧾 Achats Métaux</h2>
+            <small>Journal d'exécution</small>
+        </div>
+        <div class="header-right">
+            <a href="index.html" class="badge">← Retour</a>
+        </div>
+    </div>
+
+<!-- TABLE -->
+    <div class="card">
+        <h3>Historique</h3>
+        
+                    <table>
+                            <thead>
+                                    <tr>
+                                        <th>Dates</th>
+                                        <th>Type</th>
+                                        <th>Poids</th>
+                                        <th>Montant</th>
+                                    </tr>
+                            </thead>
+                            <tbody id="table-metaux"></tbody>
+                    </table>
+        
+                      <div class="total-line">
+                        <span>Total investi</span>
+                        <span id="total-metaux"></span>
+                      </div>
+    </div> 
+</div> 
+
+
+<script src="achats.js"></script>
+
+<script>
+// ===== HELPERS =====
+function euro(v){
+    return Math.round(v).toLocaleString('fr-BE') + " €";
+}
+
+// ===== COULEUR TYPE =====
+function getClassByType(type){
+    switch(type){
+        case "OR": return "dot-or-suisse";
+        case "ARGENT": return "dot-argent";
+        default: return "";
+    }
+}
+
+// ===== RENDER =====
+function renderAchats(){
+
+    const tbody = document.getElementById("table-metaux");
+
+    // tri DESC (plus récent en haut)
+    const sorted = [...metaux].sort((a,b)=>{
+        return new Date(b.date.split("/").reverse().join("-")) 
+             - new Date(a.date.split("/").reverse().join("-"));
+    });
+
+    tbody.innerHTML = "";
+    sorted.forEach(a => {
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${a.date}</td>
+            <td>
+                <span class="dot ${getClassByType(a.type)}"></span>
+                ${a.type === "OR" ? "Or" : "Argent"}
+            </td>
+            <td class="center">${a.poids}</td>
+            <td class="amount">${euro(a.montant)}</td>
+        `;
+
+        tbody.appendChild(row);
+    });
+
+    const total = sorted.reduce((sum, a) => sum + (a.montant || 0), 0);
+    document.getElementById("total-metaux").innerText = euro(total);
+}
+
+renderAchats();
+
+
+    
+</script>
+
+</body>
+</html>
