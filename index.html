@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"> 
 
+
 <head>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -9,8 +10,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portefeuille</title>
 
-    <link rel="stylesheet" href="couleurs.css?v=50">
-    <link rel="stylesheet" href="style.css?v=1900">
+<link rel="stylesheet" href="couleurs.css?v=20263004">
+<link rel="stylesheet" href="style.css?v=20263004">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -1306,27 +1307,27 @@ function renderMarketState(score, momentum){
     let color = COLORS.market_neutral;
 
     if(score < 0.1){
-        state = "🚨 EXTRÊME BAS";
+        state = "🚨";
         text = "Marché en stress extrême";
         color = COLORS.market_extreme_low;
     }
     else if(score < 0.25){
-        state = "🔻 BAS";
+        state = "🔻";
         text = "Marché faible";
         color = COLORS.market_low;
     }
     else if(score < 0.5){
-        state = "⚖️ NEUTRE";
+        state = "⚖️";
         text = "Marché équilibré";
         color = COLORS.market_neutral;
     }
     else if(score < 0.75){
-        state = "🔺 HAUT";
+        state = "🔺";
         text = "Marché solide";
         color = COLORS.market_high;
     }
     else{
-        state = "🔥 EXTRÊME HAUT";
+        state = "🔥";
         text = "Marché en excès";
         color = COLORS.market_extreme_high;
     }
@@ -1336,19 +1337,19 @@ function renderMarketState(score, momentum){
     
     if(momentum > 0.15){
         arrow = "⬆️";
-        strength = "forte hausse";
+        strength = "Pression ⬆️ forte";
     }
     else if(momentum > 0.05){
         arrow = "↑";
-        strength = "hausse";
+        strength = "Pression ⬆️";
     }
     else if(momentum < -0.15){
         arrow = "⬇️";
-        strength = "forte pression";
+        strength = "Pression ⬇️ forte";
     }
     else if(momentum < -0.05){
         arrow = "↓";
-        strength = "pression";
+        strength = "Pression ⬇️";
     }
 
     badge.innerText = `${state} ${arrow} · ${text} (clôtures veille)`;
@@ -1853,8 +1854,11 @@ if (donut) {
                 <div class="content">
                     <div>🇨🇭 ${euro(orSuisse)}</div>
                     <div>🇧🇪 ${euro(orBelgique)}</div>
-                    <div>⚪ ${euro(argent)}</div>
-                    <small>(revente)</small>
+<div>
+     <span class="dot dot-argent">
+     </span> ${euro(argent)}
+</div>
+     <small>(revente)</small>
                 </div>
             `;
 
@@ -1912,9 +1916,9 @@ if (donutETF) {
         if (!isOpenETF) {
 labelE.innerHTML = `
     <div class="content">
-        <div>🔵 ${euro(vMonde)}</div>
-        <div>🟢 ${euro(vSeniors)}</div>
-        <div>⚪ ${euro(vJuniors)}</div>
+        <div><span class="dot dot-monde"></span> ${euro(vMonde)}</div>
+        <div><span class="dot dot-seniors"></span> ${euro(vSeniors)}</div>
+        <div><span class="dot dot-juniors"></span> ${euro(vJuniors)}</div>
     </div>
 `;
 
