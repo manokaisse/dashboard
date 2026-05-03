@@ -10,8 +10,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portefeuille</title>
 
-<link rel="stylesheet" href="couleurs.css?v=20263006">
-<link rel="stylesheet" href="style.css?v=20263006">
+<link rel="stylesheet" href="couleurs.css?v=20263007">
+<link rel="stylesheet" href="style.css?v=20263007">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -716,6 +716,8 @@ function applyRatioColor(ratio){
          el.classList.add("ratio-chaud");
     }
 }
+
+
 
 
 
@@ -1463,6 +1465,27 @@ labelE.innerHTML = `
 function renderTables(data, p, pf, etf, pe){
 
 
+
+// 🔥🔥 setValueColor
+function setValueColor(id, value){
+
+    const el = document.getElementById(id);
+    if(!el) return;
+
+    el.innerText = euroSigned(value);
+
+    el.classList.remove("positive", "negative");
+
+    if(value > 0){
+        el.classList.add("positive");
+    } else if(value < 0){
+        el.classList.add("negative");
+    }
+}
+
+
+
+
 function setPerf(id, value){
 
     const el = document.getElementById(id);
@@ -2007,4 +2030,5 @@ function goToPage(el, url) {
 
 </body>
 </html>
+ 
  
