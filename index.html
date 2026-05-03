@@ -10,8 +10,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portefeuille</title>
 
-<link rel="stylesheet" href="couleurs.css?v=20263005">
-<link rel="stylesheet" href="style.css?v=20263005">
+<link rel="stylesheet" href="couleurs.css?v=20263006">
+<link rel="stylesheet" href="style.css?v=20263006">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -1504,7 +1504,7 @@ function setPerf(id, value){
     const benefSeniors = vSeniors - etf.seniors.buy;
     const benefJuniors = vJuniors - etf.juniors.buy;
 
-    // ===== TABLE METAUX =====
+        // ===== TABLE METAUX =====
     setText("q-or-suisse", pf.or_suisse_g.toFixed(2));
     setText("q-or-belgique", pf.or_belgique_g.toFixed(2));
     setText("q-argent", pf.argent_g.toFixed(0));
@@ -1530,9 +1530,9 @@ setValueColor("benef-argent", benefArgent);
     setText("etf-seniors-prix", pe.seniors.toFixed(2) + " €");
     setText("etf-juniors-prix", pe.juniors.toFixed(2) + " €");
 
-    setText("etf-monde-benef", euroSigned(benefMonde));
-    setText("etf-seniors-benef", euroSigned(benefSeniors));
-    setText("etf-juniors-benef", euroSigned(benefJuniors));
+    setValueColor("etf-monde-benef", benefMonde);
+    setValueColor("etf-seniors-benef", benefSeniors);
+    setValueColor("etf-juniors-benef", benefJuniors);
 
     setPerf("etf-monde-perf", perf(vMonde, etf.monde.buy));
     setPerf("etf-seniors-perf", perf(vSeniors, etf.seniors.buy));
