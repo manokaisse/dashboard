@@ -85,7 +85,7 @@ function checkBirthday(config){
 
   // 🎂 MESSAGE
   const msg = document.createElement("div");
-  msg.innerText = "🎂 Joyeux anniversaire ma chérie 😘😘😘 !";
+  msg.innerText = "🎂 Joyeux anniversaire ma petite chérie 😘❤️😘❤️😘 !";
   msg.style.position = "fixed";
   msg.style.top = "20px";
   msg.style.left = "50%";
