@@ -85,7 +85,7 @@ function checkBirthday(config){
 
   // 🎂 MESSAGE
   const msg = document.createElement("div");
-  msg.innerText = "🎂 Joyeux anniversaire !";
+  msg.innerText = "🎂 Joyeux anniversaire ma chérie 😘😘😘 !";
   msg.style.position = "fixed";
   msg.style.top = "20px";
   msg.style.left = "50%";
@@ -107,6 +107,6 @@ function checkBirthday(config){
 
 // 🎂 CONFIG
 checkBirthday({
-  day: 3,
-  month: 5
+  day: 14,
+  month: 2
 });
