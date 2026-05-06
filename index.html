@@ -10,9 +10,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portefeuille</title>
 
-<link rel="stylesheet" href="couleurs.css?v=20263007">
-<link rel="stylesheet" href="style.css?v=20263007">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="couleurs.css?v=20260308">
+<link rel="stylesheet" href="style.css?v=20260308">
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -22,12 +22,13 @@
 <!-- HEADER -->
 <div class="header">
     <div class="header-left">
-        <h2>💼 Portefeuille - Mano</h2>
+        <h2>💼 Portefeuille</h2>
         <small>Or · Argent · ETF</small>
     </div>
 
     <div class="header-actions">
-        <div id="refresh-btn" class="refresh">⟳</div>
+        <div id="refresh-btn" class="refresh" title="Rafraîchir">⟳</div>
+        <div id="focus-btn" class="refresh" title="Mode focus">🎯</div>
         <div id="variation" class="badge-perf"></div>
     </div>
 </div>
@@ -183,7 +184,7 @@
 
 <!-- GRAPH -->
 <div class="card">
-    <h3 id="chart-title">Évolution 10 jours</h3>
+    <h3 id="chart-title" title="Touchez le graphique pour agrandir / réduire">Évolution 10 jours</h3>
 
     <canvas id="chart-10j"></canvas>
 
@@ -191,6 +192,7 @@
         <button class="tf active" data-days="10">10J</button>
         <button class="tf" data-days="30">30J</button>
         <button class="tf" data-days="90">90J</button>
+        <button class="tf" data-days="180">180J</button>
     </div>
 </div>
 
@@ -260,7 +262,7 @@
 
     <div class="etf-header">
          <h3 onclick="goToPage(this, 'achatsetf.html')">ETF <small>(clôtures veille)</small></h3>
-         <div id="bpgdm" class="bpgdm-badge">--%</div>
+         <div id="bpgdm" class="bpgdm-badge" title="BPGDM : indicateur de momentum mines aurifères">--%</div>
     </div>
 
 <!-- 
@@ -386,7 +388,9 @@ const state = {
 
     portfolio: {},
     etf: {},
-    timeframe: 10
+    timeframe: 10,
+    isLoading: false,
+    refreshQueued: false
 };
 
 
@@ -402,6 +406,11 @@ function setText(id, value){
     if(DOM_CACHE[id]){
         DOM_CACHE[id].innerText = value;
     }
+}
+
+
+function setLoadingState(active){
+    document.body.classList.toggle("loading", !!active);
 }
 
 // ===== API =====
@@ -719,8 +728,6 @@ function applyRatioColor(ratio){
 
 
 
-
-
 function animateValue(target, duration = 600) {
     let start = 0;
     const stepTime = 16; // ~60fps
@@ -973,6 +980,16 @@ function render(data){
 // ===== INIT =====
 async function init(){
 
+    if (state.isLoading) {
+        state.refreshQueued = true;
+        return;
+    }
+
+    state.isLoading = true;
+
+    setLoadingState(true);
+
+
     try{
         setText("total", "Chargement...");
         setText("or", "...");
@@ -981,8 +998,11 @@ async function init(){
 
 
 
-// 🔥 1. récupérer ton sheet AVANT
-const { history: historyList, bpgdmLive } = await fetchHistory();
+// 🔥 1. récupérer les données en parallèle
+const [{ history: historyList, bpgdmLive }, livePrices] = await Promise.all([
+    fetchHistory(),
+    fetchPrices()
+]);
 
 
 // 🔥 ON STOCKE
@@ -1005,7 +1025,7 @@ console.log("BPGDM LIVE (G2):", bpgdmLive);
 
 
 // 🔥 2. FORCER le sheet comme source principale
-state.prices = await fetchPrices();
+state.prices = livePrices;
 state.portfolio = DATA.portfolio;
 state.etf = DATA.etf;
 state.bpgdm = (bpgdmLive !== 0 ? bpgdmLive : last?.bpgdm);
@@ -1163,12 +1183,14 @@ if (variationEl) {
     variationEl.innerText = diffStr + " (" + pctStr + ")";
 
     // RESET
-    variationEl.classList.remove("positive", "negative");
+    variationEl.classList.remove("positive", "negative", "neutral");
 
     if (diff > 0) {
         variationEl.classList.add("positive");
     } else if (diff < 0) {
         variationEl.classList.add("negative");
+    } else {
+        variationEl.classList.add("neutral");
     }
 
     // animation
@@ -1187,6 +1209,15 @@ if (variationEl) {
     } catch(e){
         console.error("Erreur:", e);
         setText("total", "Erreur chargement");
+    } finally {
+        state.isLoading = false;
+        setLoadingState(false);
+
+        if (state.refreshQueued) {
+            state.refreshQueued = false;
+            init();
+
+        }
     }
 }
 
@@ -1221,6 +1252,24 @@ function getVariation(now, close){
 
 // ===== HISTORY =====
 async function fetchHistory(){
+
+    const CACHE_KEY = "historyCacheV1";
+    const CACHE_TTL_MS = 5 * 60 * 1000;
+
+    try {
+        const rawCache = localStorage.getItem(CACHE_KEY);
+        if (rawCache) {
+            const parsed = JSON.parse(rawCache);
+            if (parsed?.timestamp && (Date.now() - parsed.timestamp) < CACHE_TTL_MS) {
+                return {
+                    history: parsed.history || [],
+                    bpgdmLive: parsed.bpgdmLive || 0
+                };
+            }
+        }
+    } catch (e) {
+        console.warn("Cache history invalide", e);
+    }
 
     const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSpG560WkIILBvD5K3HQh_NyHyC7dUZJFPUwR6J_xn_wFxJtkD-WCuApJQnFQAbijjGE4GwTvV6ghri/pub?gid=1311770820&single=true&output=csv";
 
@@ -1287,6 +1336,16 @@ const silverClose = cleanNumber(row[12]); // colonne M
 console.log("HISTORY:", history);
 
     
+    try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({
+            timestamp: Date.now(),
+            history,
+            bpgdmLive
+        }));
+    } catch (e) {
+        console.warn("Impossible de sauvegarder le cache history", e);
+    }
+
     return {
         history,
         bpgdmLive
@@ -1354,7 +1413,7 @@ function renderMarketState(score, momentum){
         strength = "Pression ⬇️";
     }
 
-    badge.innerText = `${state} ${arrow} · ${text} (clôtures veille)`;
+    badge.innerText = `${state} ${arrow} - ${text} (clôtures veille)`;
     badge.style.color = color;
 
     
@@ -1364,7 +1423,7 @@ if(strength){
     text += " : " + strength;
 }
 
-  badge.innerText = `${state} ${arrow} · ${text} (clôtures veille)`;
+  badge.innerText = `${state} ${arrow} - ${text} (clôtures veille)`;
   badge.style.color = color;
   updateThemeColor(color);
  
@@ -1466,7 +1525,7 @@ function renderTables(data, p, pf, etf, pe){
 
 
 
-// 🔥🔥 setValueColor
+// ===== VALEURS GAINS VERT/ROUGE =====
 function setValueColor(id, value){
 
     const el = document.getElementById(id);
@@ -1480,12 +1539,13 @@ function setValueColor(id, value){
         el.classList.add("positive");
     } else if(value < 0){
         el.classList.add("negative");
+    } else {
+        el.style.opacity = "0.6"; // neutre visuel
     }
 }
 
 
-
-
+// ===== VALEURS PERF VERT/ROUGE =====
 function setPerf(id, value){
 
     const el = document.getElementById(id);
@@ -1527,7 +1587,7 @@ function setPerf(id, value){
     const benefSeniors = vSeniors - etf.seniors.buy;
     const benefJuniors = vJuniors - etf.juniors.buy;
 
-        // ===== TABLE METAUX =====
+    // ===== TABLE METAUX =====
     setText("q-or-suisse", pf.or_suisse_g.toFixed(2));
     setText("q-or-belgique", pf.or_belgique_g.toFixed(2));
     setText("q-argent", pf.argent_g.toFixed(0));
@@ -1573,13 +1633,13 @@ setValueColor("benef-argent", benefArgent);
 let pulse = 0;
 
 setInterval(() => {
+  if (document.hidden || !window.chart10j) return;
+
   pulse += 0.1;
   if (pulse > Math.PI * 2) pulse = 0;
 
-  if (window.chart10j) {
-    window.chart10j.update();
-  }
-}, 100);
+  window.chart10j.update("none");
+}, 120);
 
 
 
@@ -1825,6 +1885,46 @@ window.chart10j = new Chart(ctx, {
 } // ✅ ICI → fermeture de renderChart()
  
  
+
+function toggleChartFullscreen(){
+    const chartCard = document.querySelector("#chart-10j")?.closest(".card");
+    if(!chartCard) return;
+
+    const isActive = chartCard.dataset.fullscreen === "1";
+
+    if(!isActive){
+        chartCard.dataset.fullscreen = "1";
+        chartCard.dataset.prevStyle = chartCard.getAttribute("style") || "";
+        chartCard.style.position = "fixed";
+        chartCard.style.inset = "0";
+        chartCard.style.margin = "0";
+        chartCard.style.zIndex = "10000";
+        chartCard.style.borderRadius = "0";
+        chartCard.style.padding = "14px";
+        chartCard.style.height = "100dvh";
+        chartCard.style.width = "100vw";
+        chartCard.style.maxWidth = "100vw";
+
+        const canvas = document.getElementById("chart-10j");
+        if(canvas){
+            canvas.style.height = "calc(100dvh - 140px)";
+        }
+    } else {
+        chartCard.dataset.fullscreen = "0";
+        chartCard.setAttribute("style", chartCard.dataset.prevStyle || "");
+
+        const canvas = document.getElementById("chart-10j");
+        if(canvas){
+            canvas.style.height = "";
+        }
+    }
+
+    if (window.chart10j) {
+        window.chart10j.resize();
+        window.chart10j.update("none");
+    }
+}
+
 // ===== START =====
 window.addEventListener("DOMContentLoaded", () => {
 
@@ -1838,6 +1938,8 @@ window.addEventListener("DOMContentLoaded", () => {
     if (refreshBtn) {
         refreshBtn.addEventListener("click", () => {
 
+            if (state.isLoading) return;
+
             refreshBtn.style.transform = "rotate(360deg)";
             refreshBtn.style.transition = "0.6s";
 
@@ -1848,6 +1950,34 @@ window.addEventListener("DOMContentLoaded", () => {
             init();
         });
     }
+
+
+
+    const focusBtn = document.getElementById("focus-btn");
+
+    function disableFocusMode(){
+        if (!document.body.classList.contains("focus-mode")) return;
+        document.body.classList.remove("focus-mode");
+        if (focusBtn) focusBtn.innerText = "🎯";
+    }
+
+    if (focusBtn) {
+        focusBtn.addEventListener("click", () => {
+            document.body.classList.toggle("focus-mode");
+            focusBtn.innerText = document.body.classList.contains("focus-mode") ? "✕" : "🎯";
+        });
+    }
+
+    let focusScrollTimeout;
+    window.addEventListener("scroll", () => {
+        if (!document.body.classList.contains("focus-mode")) return;
+
+        clearTimeout(focusScrollTimeout);
+        focusScrollTimeout = setTimeout(() => {
+            if (window.scrollY > 40) disableFocusMode();
+        }, 80);
+    }, { passive: true });
+
 
 // ===== CLICK DONUT METAUX =====
     const donut = document.getElementById("donut-metaux");
@@ -1975,6 +2105,11 @@ labelE.innerHTML = `
         });
     }
 
+    const chartCanvas = document.getElementById("chart-10j");
+    if (chartCanvas) {
+        chartCanvas.addEventListener("click", toggleChartFullscreen);
+    }
+
     // ===== TIMEFRAME =====
     document.querySelectorAll(".tf").forEach(btn => {
         btn.addEventListener("click", () => {
@@ -2030,5 +2165,4 @@ function goToPage(el, url) {
 
 </body>
 </html>
- 
  
