@@ -1134,7 +1134,8 @@ if (last && last.monde && last.seniors && last.juniors) {
     state.etfPrices = {
         monde: last.monde,
         seniors: last.seniors,
-        juniors: last.juniors
+        juniors: last.juniors,
+        petrole: last.petrole
     };
 
 } else {
@@ -1361,8 +1362,9 @@ console.log("ROW 1:", rows[1]);
         const score = cleanNumber(row[6]);
         const momentum = cleanNumber(row[7]);
 
-const goldClose = cleanNumber(row[11]);   // colonne L
-const silverClose = cleanNumber(row[12]); // colonne M
+        const goldClose = cleanNumber(row[11]);   // colonne L
+        const silverClose = cleanNumber(row[12]); // colonne M
+        const petrole = cleanNumber(row[13]); // colonne N
         
         console.log("ROW:", row);
       
@@ -1374,6 +1376,7 @@ const silverClose = cleanNumber(row[12]); // colonne M
                 monde,
                 seniors,
                 juniors,
+                petrole,
                 bpgdm,
                 score,
                 momentum,
