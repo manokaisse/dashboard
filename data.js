@@ -2,11 +2,11 @@ const DATA = {
   portfolio: {
     or_suisse_g: 201.51,
     or_belgique_g: 0,
-    argent_g: 155.50,
+    argent_g: 311.00,
 
     or_suisse_cost: 9125,
     or_belgique_cost: 0,
-    argent_cost: 284.66
+    argent_cost: 573.20
   },
 
   etf: {
