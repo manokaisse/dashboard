@@ -501,7 +501,8 @@ async function fetchPrices(){
         const result = {
             monde: safePrice(vwce) || 150,
             seniors: seniors,
-            juniors: safePrice(gdxj) * rate
+            juniors: safePrice(gdxj) * rate,
+            petrole: 0
         };
 
 
@@ -520,7 +521,8 @@ async function fetchPrices(){
         return cache || {
             monde: 0,
             seniors: 0,
-            juniors: 0
+            juniors: 0,
+            petrole: 0
         };
     }
 }
@@ -2131,6 +2133,7 @@ if (donutETF) {
         const pMonde = (vMonde / totalETF) * 100;
         const pSeniors = (vSeniors / totalETF) * 100;
         const pJuniors = (vJuniors / totalETF) * 100;
+        const pPetrole = (vPetrole / totalETF) * 100;
 
         if (!isOpenETF) {
 labelE.innerHTML = `
