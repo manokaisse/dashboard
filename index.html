@@ -172,6 +172,13 @@
             <span id="p-juniors"></span>
         </div>
 
+        <div class="legend-item">
+            <span class="dot dot-petrole"></span>
+            <span>Pétrole :</span>
+            <span id="p-petrole"></span>
+        </div>
+        
+
      
     </div>
 </div>
@@ -300,6 +307,14 @@
 <td id="etf-juniors-prix"></td>
 <td id="etf-juniors-benef"></td>
 <td id="etf-juniors-perf"></td>
+</tr>
+
+<tr onclick="goToPage(this, 'etf-petrole.html')">
+    <td>Pétrole</td>
+    <td id="etf-petrole-parts"></td>
+    <td id="etf-petrole-prix"></td>
+    <td id="etf-petrole-benef"></td>
+    <td id="etf-petrole-perf"></td>
 </tr>
 
 </table>
@@ -574,13 +589,19 @@ function calculate(){
     const vMonde = etf.monde.parts * pe.monde;
     const vSeniors = etf.seniors.parts * pe.seniors;
     const vJuniors = etf.juniors.parts * pe.juniors;
+    const vPetrole = etf.petrole.parts * pe.petrole;
 
-    const totalETF = vMonde + vSeniors + vJuniors || 0;
+    const totalETF =
+    vMonde +
+    vSeniors +
+    vJuniors +
+    vPetrole || 0;
 
     // % ETF
     const pMonde = totalETF ? (vMonde / totalETF) * 100 : 0;
     const pSeniors = totalETF ? (vSeniors / totalETF) * 100 : 0;
     const pJuniors = totalETF ? (vJuniors / totalETF) * 100 : 0;
+    const pPetrole = totalETF ? (vPetrole / totalETF) * 100 : 0;
 
 // TOTAL GLOBAL
     const total = goldTotal + silverTotal + totalETF;
@@ -613,10 +634,12 @@ const pArgentTotal = (silverTotal / totalMetauxSafe) * 100;
         vMonde,
         vSeniors,
         vJuniors,
+        vPetrole,
         totalETF,
         pMonde,
         pSeniors,
         pJuniors,
+        pPetrole,
         pMetaux,
         pETF,
         pOrTotal,
@@ -815,7 +838,7 @@ el.style.background = `
 
 
  
-function animateDonutETF(el, e1, e2, e3, duration = 800){
+function animateDonutETF(el, e1, e2, e3, e4, duration = 800){
 
 console.log("ETF %:", e1, e2, e3);
 
@@ -825,7 +848,7 @@ console.log("ETF %:", e1, e2, e3);
     e2 = e2 < 0.01 ? 0 : e2;
     e3 = e3 < 0.01 ? 0 : e3;
 
-    let total = e1 + e2 + e3;
+    let total = e1 + e2 + e3 + e4;
 
 
 // 💥 cas critique : tout à zéro
@@ -839,6 +862,7 @@ console.log("ETF %:", e1, e2, e3);
     e1 = (e1 / total) * 100;
     e2 = (e2 / total) * 100;
     e3 = (e3 / total) * 100;
+    e4 = (e4 / total) * 100;
  
     let start = null;
 
@@ -853,9 +877,10 @@ console.log("ETF %:", e1, e2, e3);
 
 el.style.background = `
     conic-gradient(
-        ${COLORS.etf_monde} 0% ${p1}%,
-        ${COLORS.etf_seniors} ${p1}% ${p1 + p2}%,
-        ${COLORS.etf_juniors} ${p1 + p2}% 100%
+         ${COLORS.etf_monde} 0% ${p1}%,
+            ${COLORS.etf_seniors} ${p1}% ${p1+p2}%,
+            ${COLORS.etf_juniors} ${p1+p2}% ${p1+p2+p3}%,
+            ${COLORS.etf_petrole} ${p1+p2+p3}% 100%
     )
 `;
 
@@ -1511,15 +1536,18 @@ labelM.innerHTML = `
     const e1 = Math.max(0, data.pMonde || 0);
     const e2 = Math.max(0, data.pSeniors || 0);
     const e3 = Math.max(0, data.pJuniors || 0);
+    const e4 = Math.max(0, data.pPetrole || 0);
 
     setText("p-monde", percent(e1));
     setText("p-seniors", percent(e2));
     setText("p-juniors", percent(e3));
+    setText("p-petrole", percent(e4));
+    
  
     const de = document.querySelector(".donut.etf .donut-inner");
 
     if(de){
-        animateDonutETF(de, e1, e2, e3);
+        animateDonutETF(de, e1, e2, e3, e4);
 
         de.parentElement.classList.add("show", "enter");
         setTimeout(() => {
@@ -1608,10 +1636,12 @@ function setPerf(id, value){
     const vMonde = data.vMonde;
     const vSeniors = data.vSeniors;
     const vJuniors = data.vJuniors;
+    const vPetrole = data.vPetrole;
 
     const benefMonde = vMonde - etf.monde.buy;
     const benefSeniors = vSeniors - etf.seniors.buy;
     const benefJuniors = vJuniors - etf.juniors.buy;
+    const benefPetrole = vPetrole - etf.petrole.buy;
 
     // ===== TABLE METAUX =====
     setText("q-or-suisse", pf.or_suisse_g.toFixed(2));
@@ -1623,8 +1653,8 @@ function setPerf(id, value){
     setText("p-argent-g", p.silver_per_g.toFixed(2) + " €");
 
     setValueColor("benef-or-suisse", benefOrSuisse);
-setValueColor("benef-or-belgique", benefOrBelgique);
-setValueColor("benef-argent", benefArgent);
+    setValueColor("benef-or-belgique", benefOrBelgique);
+    setValueColor("benef-argent", benefArgent);
 
     setPerf("perf-or-suisse", perf(orSuisse, pf.or_suisse_cost));
     setPerf("perf-or-belgique", perf(orBelgique, pf.or_belgique_cost));
@@ -1634,18 +1664,22 @@ setValueColor("benef-argent", benefArgent);
     setText("etf-monde-parts", etf.monde.parts);
     setText("etf-seniors-parts", etf.seniors.parts);
     setText("etf-juniors-parts", etf.juniors.parts);
+    setText("etf-petrole-parts", etf.petrole.parts);
 
     setText("etf-monde-prix", pe.monde.toFixed(2) + " €");
     setText("etf-seniors-prix", pe.seniors.toFixed(2) + " €");
     setText("etf-juniors-prix", pe.juniors.toFixed(2) + " €");
+    setText("etf-petrole-prix", pe.petrole.toFixed(2) + " €");
 
     setValueColor("etf-monde-benef", benefMonde);
     setValueColor("etf-seniors-benef", benefSeniors);
     setValueColor("etf-juniors-benef", benefJuniors);
+    setValueColor("etf-petrole-benef", benefPetrole);
 
     setPerf("etf-monde-perf", perf(vMonde, etf.monde.buy));
     setPerf("etf-seniors-perf", perf(vSeniors, etf.seniors.buy));
     setPerf("etf-juniors-perf", perf(vJuniors, etf.juniors.buy));
+    setPerf("etf-petrole-perf", perf(vPetrole, etf.petrole.buy));
 
     // ===== TOTAL METAUX =====
     setText("metaux-total-bottom", euro(orSuisse + orBelgique + argent));
@@ -2086,8 +2120,9 @@ if (donutETF) {
         const vMonde = etf.monde.parts * pe.monde;
         const vSeniors = etf.seniors.parts * pe.seniors;
         const vJuniors = etf.juniors.parts * pe.juniors;
+        const vPetrole = etf.petrole.parts * pe.petrole;
 
-        const totalETF = vMonde + vSeniors + vJuniors || 1;
+        const totalETF = vMonde + vSeniors + vJuniors + vPetrole || 1;
 
         const pMonde = (vMonde / totalETF) * 100;
         const pSeniors = (vSeniors / totalETF) * 100;
@@ -2099,6 +2134,7 @@ labelE.innerHTML = `
         <div><span class="dot dot-monde"></span> ${euro(vMonde)}</div>
         <div><span class="dot dot-seniors"></span> ${euro(vSeniors)}</div>
         <div><span class="dot dot-juniors"></span> ${euro(vJuniors)}</div>
+        <div><span class="dot dot-petrole"></span> ${euro(vPetrole)}</div>
     </div>
 `;
 
