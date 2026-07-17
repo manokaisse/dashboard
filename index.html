@@ -565,7 +565,9 @@ async function fetchPrices(){
             monde: safePrice(vwce) || 150,
             seniors: seniors,
             juniors: safePrice(gdxj) * rate,
-            petrole: 0
+            petrole: 0,
+            or: 0,
+            argent: 0
         };
 
 
@@ -585,7 +587,9 @@ async function fetchPrices(){
             monde: 0,
             seniors: 0,
             juniors: 0,
-            petrole: 0
+            petrole:0,
+            or:0,
+            argent:0
         };
     }
 }
@@ -1212,7 +1216,15 @@ if (elB) {
 // ⚠️ on initialise vide
 // 🔥 ETF PRICES (Sheet priorité, API fallback)
 
-if (last && last.monde && last.seniors && last.juniors) {
+if (
+    last &&
+    last.monde &&
+    last.seniors &&
+    last.juniors &&
+    last.petrole &&
+    last.etfOr &&
+    last.etfArgent
+) {
 
     console.log("✅ ETF depuis SHEET");
 
@@ -1220,7 +1232,9 @@ if (last && last.monde && last.seniors && last.juniors) {
         monde: last.monde,
         seniors: last.seniors,
         juniors: last.juniors,
-        petrole: last.petrole
+        petrole: last.petrole,
+        or: last.etfOr,
+        argent: last.etfArgent
     };
 
 } else {
@@ -1450,23 +1464,27 @@ console.log("ROW 1:", rows[1]);
         const goldClose = cleanNumber(row[11]);   // colonne L
         const silverClose = cleanNumber(row[12]); // colonne M
         const petrole = cleanNumber(row[13]); // colonne N
+        const etfOr = cleanNumber(row[14]);       // colonne O
+        const etfArgent = cleanNumber(row[15]);   // colonne P
         
         console.log("ROW:", row);
       
 
         if (date && total > 0) {
             history.push({
-                date,
-                total,
-                monde,
-                seniors,
-                juniors,
-                petrole,
-                bpgdm,
-                score,
-                momentum,
-                goldClose,
-                silverClose
+                    date,
+                    total,
+                    monde,
+                    seniors,
+                    juniors,
+                    petrole,
+                    etfOr,
+                    etfArgent,
+                    bpgdm,
+                    score,
+                    momentum,
+                    goldClose,
+                    silverClose
             });
         }
     }
