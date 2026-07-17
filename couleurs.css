@@ -13,6 +13,8 @@
   --etf-juniors: #a78bfa;  /* Rose / magenta soft */
   --etf-seniors: #f472b6;  /* violet */
   --etf-petrole: #fb923c;
+  --etf-or: #d4af37;
+  --etf-argent: #bfc5cd;
 
   --ratio-froid: #9ca3af;
   --ratio-moyen: #f59e0b;
@@ -82,6 +84,8 @@
 .dot-seniors { background: var(--etf-seniors); }
 .dot-juniors { background: var(--etf-juniors); }
 .dot-petrole { background: var(--etf-petrole); }
+.dot-etf-or{ background:var(--etf-or); }
+.dot-etf-argent{ background:var(--etf-argent); }
 
 
 /* PERF */
