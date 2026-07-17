@@ -175,26 +175,7 @@
         <div class="legend-item">
             <span class="dot dot-etf-or"></span>
             <span>Or :</span>
-            <span id="p-etf-or"></span>
-        </div>
-        
-        <div class="legend-item">
-            <span class="dot dot-etf-argent"></span>
-            <span>Argent :</span>
-            <span id="p-etf-argent"></span>
-        </div>
-
-        
-        <div class="legend-item">
-            <span class="dot dot-petrole"></span>
-            <span>Pétrole :</span>
-            <span id="p-petrole"></span>
-        </div>
-
-        <div class="legend-item">
-            <span class="dot dot-etf-or"></span>
-            <span>Or :</span>
-            <span id="p-or"></span>
+            <<span id="p-or"></span>
         </div>
         
         <div class="legend-item">
@@ -204,7 +185,11 @@
         </div>
 
         
-
+        <div class="legend-item">
+            <span class="dot dot-petrole"></span>
+            <span>Pétrole :</span>
+            <span id="p-petrole"></span>
+        </div>
      
     </div>
 </div>
@@ -358,23 +343,6 @@
     <td id="etf-petrole-benef"></td>
     <td id="etf-petrole-perf"></td>
 </tr>
-
-<tr onclick="goToPage(this, 'etf-or.html')">
-    <td>Or</td>
-    <td id="etf-or-parts"></td>
-    <td id="etf-or-prix"></td>
-    <td id="etf-or-benef"></td>
-    <td id="etf-or-perf"></td>
-</tr>
-
-<tr onclick="goToPage(this, 'etf-argent.html')">
-    <td>Argent</td>
-    <td id="etf-argent-parts"></td>
-    <td id="etf-argent-prix"></td>
-    <td id="etf-argent-benef"></td>
-    <td id="etf-argent-perf"></td>
-</tr>
-
 
         
 
@@ -965,10 +933,10 @@ console.log("ETF %:", e1, e2, e3);
 
 el.style.background = `
     conic-gradient(
-         ${COLORS.etf_monde} 0% ${p1}%,
+            ${COLORS.etf_monde} 0% ${p1}%,
             ${COLORS.etf_seniors} ${p1}% ${p1+p2}%,
             ${COLORS.etf_juniors} ${p1+p2}% ${p1+p2+p3}%,
-            ${COLORS.etf_petrole} ${p1+p2+p3}% 100%
+            ${COLORS.etf_petrole} ${p1+p2+p3}% ${p1+p2+p3+p4}%,
             ${COLORS.etf_or} ${p1+p2+p3+p4}% ${p1+p2+p3+p4+p5}%,
             ${COLORS.etf_argent} ${p1+p2+p3+p4+p5}% 100%
     )
@@ -1101,7 +1069,7 @@ function render(data){
     const p = state.prices;
     const pf = state.portfolio;
     const etf = state.etf;
-    const pe = state.etfPrices || { monde:0, seniors:0, juniors:0 };
+    const pe = state.etfPrices || { monde:0, seniors:0, juniors:0, petrole:0, or:0, argent:0 };
 
     // 🔥 NOUVEAU (modulaire)
     renderKPI(data, p);
