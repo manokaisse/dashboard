@@ -11,7 +11,7 @@ const DATA = {
 
   etf: {
     argent: { parts: 5, buy: 248.36 },
-    monde: { parts: 3, buy: 484.32 },
+    monde: { parts: 4, buy: 653.43 },
     seniors: { parts: 14, buy: 1028.89 },
     juniors: { parts: 0, buy: 0 },
     petrole: { parts: 0, buy: 0},
