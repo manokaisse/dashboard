@@ -1,4 +1,4 @@
-const achats = [
+const achats = [  
 {date: "03/09/2026", type: "ETF_MONDE", montant: 171.38, parts: 1, label: "1 ETF Monde"},  
 {date: "03/08/2026", type: "ETF_MONDE", montant: 169.11, parts: 1, label: "1 ETF Monde"},
 {date: "17/07/2026", type: "ETF_SENIOR", montant: 212.15, parts: 3, label: "3 ETF SENIORS"},  
